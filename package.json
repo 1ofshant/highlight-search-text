@@ -1,0 +1,54 @@
+{
+  "name": "highlight-search-text",
+  "version": "1.1.0",
+  "private": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "description": "Responsive component for highlighting text by keywords for React. May be useful for searching.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/1ofshant/highlight-search-text"
+  },
+  "dependencies": {
+    "react": "^16.8",
+    "react-dom": "^16.8",
+    "react-scripts": "3.4.1"
+  },
+  "babel": {
+    "presets": [
+      "@babel/react"
+    ]
+  },
+  "keywords": [
+    "highlight",
+    "search",
+    "text",
+    "react"
+  ],
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "publish:npm": "rm -rf dist && mkdir dist && npx babel src --out-dir dist --copy-files"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4"
+  }
+}
