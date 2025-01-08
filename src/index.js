@@ -1,24 +1,51 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useMemo, useCallback, memo } from 'react';
+import React, { useMemo, useCallback, memo } from "react";
 
 const punctuationMarks = [
-  '.', ',', '!', '?', ':', ';', '@', '$', '*', '(', ')', '-', '=', '^', '%', '[', ']', '{', '}',
-  '<', '>', '/', '\\', '\'', '|', '_', '+', '`', '~'
+  ".",
+  ",",
+  "!",
+  "?",
+  ":",
+  ";",
+  "@",
+  "$",
+  "*",
+  "(",
+  ")",
+  "-",
+  "=",
+  "^",
+  "%",
+  "[",
+  "]",
+  "{",
+  "}",
+  "<",
+  ">",
+  "/",
+  "\\",
+  "'",
+  "|",
+  "_",
+  "+",
+  "`",
+  "~",
 ];
 
 const SelectPieceOfText = (props) => {
   const {
-    text = '',
-    search = '',
-    highlightClassName = '',
-    containerClassName = '',
-    className = '',
+    text = "",
+    search = "",
+    highlightClassName = "",
+    containerClassName = "",
+    className = "",
     startWord = false,
     endWord = false,
     fullWord = false,
     all = false,
     spaceIgnore = false,
-    caseIgnore = false
+    caseIgnore = false,
   } = props;
 
   const searchText = useMemo(() => {
@@ -37,43 +64,54 @@ const SelectPieceOfText = (props) => {
     return searchedText;
   }, [caseIgnore, spaceIgnore, text]);
 
-  const getFirstIndex = useCallback((startIndex = 0) => {
-    const index = searchedText.indexOf(searchText, startIndex);
+  const getFirstIndex = useCallback(
+    (startIndex = 0) => {
+      const index = searchedText.indexOf(searchText, startIndex);
 
-    if(!searchText || !searchedText || !~index) return -1;
+      if (!searchText || !searchedText || !~index) return -1;
 
-    let conditions;
+      let conditions;
 
-    if (startWord) {
-      conditions = index!== 0 && searchedText[index - 1] !== ' '
-        && !punctuationMarks.includes(searchedText[index - 1])
-    }
+      if (startWord) {
+        conditions =
+          index !== 0 &&
+          searchedText[index - 1] !== " " &&
+          !punctuationMarks.includes(searchedText[index - 1]);
+      }
 
-    if (endWord) {
-      conditions = (typeof conditions === 'undefined' || conditions)
-        && searchedText.length !== index + searchText.length
-        && searchedText[index + searchText.length] !== ' '
-        && !punctuationMarks.includes(searchedText[index + searchText.length])
-    }
+      if (endWord) {
+        conditions =
+          (typeof conditions === "undefined" || conditions) &&
+          searchedText.length !== index + searchText.length &&
+          searchedText[index + searchText.length] !== " " &&
+          !punctuationMarks.includes(searchedText[index + searchText.length]);
+      }
 
-    if (fullWord) {
-      conditions = (typeof conditions === 'undefined' || conditions)
-        && ((index !== 0 && searchedText[index - 1] !== ' ' && !punctuationMarks.includes(searchedText[index - 1]))
-        || ((searchedText.length !== index + searchText.length)
-        && searchedText[index + searchText.length] !== ' '
-        && !punctuationMarks.includes(searchedText[index + searchText.length])))
-    }
+      if (fullWord) {
+        conditions =
+          (typeof conditions === "undefined" || conditions) &&
+          ((index !== 0 &&
+            searchedText[index - 1] !== " " &&
+            !punctuationMarks.includes(searchedText[index - 1])) ||
+            (searchedText.length !== index + searchText.length &&
+              searchedText[index + searchText.length] !== " " &&
+              !punctuationMarks.includes(
+                searchedText[index + searchText.length]
+              )));
+      }
 
-    if (conditions) {
-      return getFirstIndex(index + 1);
-    }
-    return index;
-  }, [endWord, fullWord, startWord, searchText, searchedText]);
+      if (conditions) {
+        return getFirstIndex(index + 1);
+      }
+      return index;
+    },
+    [endWord, fullWord, startWord, searchText, searchedText]
+  );
 
   const getAllIndexes = useCallback(() => {
     const index = searchedText.indexOf(searchText);
 
-    if(!searchText || !searchedText || !~index) return -1;
+    if (!searchText || !searchedText || !~index) return -1;
 
     const indexes = [];
 
@@ -99,53 +137,77 @@ const SelectPieceOfText = (props) => {
       const highlightText = text.substr(index, searchText.length);
       const afterHighlightText = text.substring(index + searchText.length);
 
-      const beforeHighlightTextElement = beforeHighlightText
-        && <span key="before" className={className}>{beforeHighlightText}</span>
+      const beforeHighlightTextElement = beforeHighlightText && (
+        <span key="before" className={className}>
+          {beforeHighlightText}
+        </span>
+      );
 
-      const afterHighlightTextElement = afterHighlightText
-        && <span key="after" className={className}>{afterHighlightText}</span>
+      const afterHighlightTextElement = afterHighlightText && (
+        <span key="after" className={className}>
+          {afterHighlightText}
+        </span>
+      );
 
       return [
-      ...([beforeHighlightTextElement] || []),
-        <span key='highlight' className={highlightClassName}>{highlightText}</span>,
-        ...([afterHighlightTextElement] || [])
+        ...([beforeHighlightTextElement] || []),
+        <span key="highlight" className={highlightClassName}>
+          {highlightText}
+        </span>,
+        ...([afterHighlightTextElement] || []),
       ];
     }
 
-    return <span className={className}>{text}</span>
-  }, [className, getFirstIndex, highlightClassName, searchText.length, text])
+    return <span className={className}>{text}</span>;
+  }, [className, getFirstIndex, highlightClassName, searchText.length, text]);
 
   const highlightAllWord = useCallback(() => {
     const indexes = getAllIndexes();
 
     if (indexes.length) {
-      const { highlightedTexts, lastEndIndex } =  indexes.reduce((accumData, index) => {
-        const { highlightedTexts, lastEndIndex } = accumData;
+      const { highlightedTexts, lastEndIndex } = indexes.reduce(
+        (accumData, index) => {
+          const { highlightedTexts, lastEndIndex } = accumData;
 
-        const beforeHighlightText = text.substring(lastEndIndex, index);
-        const highlightText = text.substr(index, searchText.length);
+          const beforeHighlightText = text.substring(lastEndIndex, index);
+          const highlightText = text.substr(index, searchText.length);
 
-        const beforeHighlightTextElement = beforeHighlightText
-        && <span key={`before${index}`} className={className}>{beforeHighlightText}</span>
+          const beforeHighlightTextElement = beforeHighlightText && (
+            <span key={`before${index}`} className={className}>
+              {beforeHighlightText}
+            </span>
+          );
 
-        const highlightTextElement = <span key={`highlight${index}`} className={highlightClassName}>{highlightText}</span>;
+          const highlightTextElement = (
+            <span key={`highlight${index}`} className={highlightClassName}>
+              {highlightText}
+            </span>
+          );
 
-        return {
-          lastEndIndex: index + searchText.length,
-          highlightedTexts: [...highlightedTexts, beforeHighlightTextElement, highlightTextElement]
-        };
-
-      }, { lastEndIndex: 0, highlightedTexts: [] });
+          return {
+            lastEndIndex: index + searchText.length,
+            highlightedTexts: [
+              ...highlightedTexts,
+              beforeHighlightTextElement,
+              highlightTextElement,
+            ],
+          };
+        },
+        { lastEndIndex: 0, highlightedTexts: [] }
+      );
 
       const afterHighlightText = text.substring(lastEndIndex);
 
-      const afterHighlightTextElement = afterHighlightText
-        && <span key="after" className={className}>{afterHighlightText}</span>
+      const afterHighlightTextElement = afterHighlightText && (
+        <span key="after" className={className}>
+          {afterHighlightText}
+        </span>
+      );
 
       return [...highlightedTexts, ...([afterHighlightTextElement] || [])];
     }
 
-    return <span className={className}>{text}</span>
+    return <span className={className}>{text}</span>;
   }, [className, getAllIndexes, highlightClassName, searchText.length, text]);
 
   const renderElements = useCallback(() => {
@@ -155,20 +217,16 @@ const SelectPieceOfText = (props) => {
     return highlightFirstWord();
   }, [all, highlightAllWord, highlightFirstWord]);
 
-  return (
-    <span className={containerClassName}>
-      {renderElements()}
-    </span>
-  );
+  return <span className={containerClassName}>{renderElements()}</span>;
 };
 
 const memoFn = (props, nextProps) => {
   const updated = Object.entries(props).reduce((accumBool, [key, value]) => {
     if (!accumBool || nextProps[key] !== value) return false;
-    return true
+    return true;
   }, true);
 
   return updated;
 };
 
-export default  memo(SelectPieceOfText, memoFn);
+export default memo(SelectPieceOfText, memoFn);
